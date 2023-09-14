@@ -7,10 +7,10 @@ def connections_game():
     return Connections()
 
 @pytest.mark.parametrize("message", (
-        "🟪🟪🟪🟪\n🟪🟪🟪🟪\n🟪🟦🟪🟪\n🟪🟪🟪🟪",
-        "🟩🟪🟪🟪\n🟪🟩🟦🟪\n🟪🟪🟦🟪\n🟪🟪🟪🟪",
-        "🟪🟦🟪🟪\n🟪🟪🟩🟪\n🟪🟩🟪🟪\n🟪🟪🟪🟪\nWoohoo!!",
-        "🟪🟪🟪🟪\n🟪🟦🟪🟪\n🟪🟪🟪🟪\n🟪🟪🟪🟪\nSome other text",
+    "🟪🟪🟪🟪\n🟪🟪🟪🟪\n🟪🟦🟪🟪\n🟪🟪🟪🟪",
+    "🟩🟪🟪🟪\n🟪🟩🟦🟪\n🟪🟪🟦🟪\n🟪🟪🟪🟪",
+    "🟪🟦🟪🟪\n🟪🟪🟩🟪\n🟪🟩🟪🟪\n🟪🟪🟪🟪\nWoohoo!!",
+    "🟪🟪🟪🟪\n🟪🟦🟪🟪\n🟪🟪🟪🟪\n🟪🟪🟪🟪\nSome other text",
 ))
 def test_valid_message_correct(message: str, connections_game: Connections):
     message = f"Connections \nPuzzle #123\n{message}" 

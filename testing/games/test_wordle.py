@@ -37,7 +37,3 @@ def test_valid_message_with_guesses(guesses: int, wordle_game: Wordle):
 def test_invalid_message(message: str, wordle_game: Wordle):
     result = wordle_game.analyse_message(message)
     assert result is None
-
-
-if __name__ == "__main__":
-    pytest.main()
