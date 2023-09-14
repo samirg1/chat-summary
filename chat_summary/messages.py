@@ -1,7 +1,6 @@
 import sqlite3
 import sys
-from os import listdir
-from sqlite3 import OperationalError, connect
+import os
 from typing import Any, Generator, cast
 
 from pandas import read_sql_query  # pyright: ignore[reportUnknownVariableType]
@@ -17,13 +16,13 @@ class MessagesDB:
         self._display_name = user
         self.silence_contact_error = silence_contact_error
 
-        if user not in listdir("/Users"):
+        if user not in os.listdir("/Users"):
             print("invalid user, user not found", file=sys.stderr)
             exit(1)
 
         try:
-            self._connection = connect(f"/Users/{user}/Library/Messages/chat.db")
-        except sqlite3.OperationalError:
+            self._connection = sqlite3.connect(f"/Users/{user}/Library/Messages/chat.db")
+        except (sqlite3.OperationalError, FileNotFoundError):
             print("could not connect to messages database, ensure you have the right permissions to access file", file=sys.stderr)
             exit(1)
 
@@ -49,9 +48,9 @@ class MessagesDB:
 
     def _get_addressbook_db_path(self) -> str:
         address_source_path = f"/Users/{self._user}/Library/Application Support/AddressBook/Sources"  # base path
-        for dir in listdir(address_source_path):
+        for dir in os.listdir(address_source_path):
             if not dir.count("."):  # go one step in each folder
-                for file in listdir(f"{address_source_path}/{dir}"):
+                for file in os.listdir(f"{address_source_path}/{dir}"):
                     if file.count("."):  # find the correct file
                         if file == "AddressBook-v22.abcddb":
                             return f"{address_source_path}/{dir}/{file}"
@@ -81,7 +80,7 @@ class MessagesDB:
         all_contacts = DataFrame()
         try:
             address_path = self._get_addressbook_db_path()
-            contacts_connection = connect(address_path)
+            contacts_connection = sqlite3.connect(address_path)
 
             all_contacts = read_sql_query(
                 """
@@ -97,7 +96,7 @@ class MessagesDB:
                 contacts_connection,
             )  # get all contacts
             contacts_connection.close()
-        except (FileNotFoundError, OperationalError):  # contact info was not able to be found
+        except (FileNotFoundError, sqlite3.OperationalError):  # contact info was not able to be found
             if not self.silence_contact_error:
                 print("unable to find contacts", file=sys.stderr)
             return [ChatMember(number, number) for number in numbers] + [ChatMember(self._user, "")]
@@ -119,7 +118,7 @@ class MessagesDB:
                     break
 
             else:  # if we did not find a contact, set the contact name to just the number
-                chat_members.append(ChatMember(number, number))
+                chat_members.append(ChatMember(number, number))  # pragma: no cover
 
         chat_members.append(ChatMember(self._display_name, ""))
         return chat_members
