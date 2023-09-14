@@ -20,11 +20,11 @@ class Game(ABC):
 
     @abstractmethod
     def _get_regex(self) -> str:
-        ...
+        pass  # pragma: no cover
 
     @abstractmethod
     def analyse_message(self, message: str) -> None | RESULT:
-        pass
+        pass  # pragma: no cover
 
     @property
     def range(self) -> int:
