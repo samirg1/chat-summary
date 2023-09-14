@@ -1,7 +1,7 @@
 from chat_summary.get_available_games import get_available_chat_games
 
 
-def update_readme():
+def update_readme() -> None:
     new_contents: list[str] = []
     with open("README.md") as f:
         contents = f.readlines()

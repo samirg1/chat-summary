@@ -42,7 +42,7 @@ class ChatSummary:
                     continue
                 member.game_scores[type(game).__name__].add(result)
 
-    def display(self):
+    def display(self) -> None:
         for i, game in enumerate(self._games):
             game_name = type(game).__name__
             total_days = game.range

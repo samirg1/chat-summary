@@ -1,6 +1,6 @@
 import re
 from abc import ABC, abstractmethod
-from typing import NamedTuple
+from typing import Literal, NamedTuple
 
 
 class RESULT(NamedTuple):
@@ -49,13 +49,13 @@ class GameScore:
             self._fails.add(_result.game_number)
 
     @property
-    def completed(self):
+    def completed(self) -> int:
         return len(self._games)
 
     @property
-    def attempts(self):
+    def attempts(self) -> int:
         return self.completed + len(self._fails)
 
     @property
-    def average_guesses(self):
+    def average_guesses(self) -> float | Literal[0]:
         return 0 if len(self._games) == 0 else self._total_guesses / len(self._games)

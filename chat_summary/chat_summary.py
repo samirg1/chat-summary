@@ -5,7 +5,7 @@ from chat_summary.chat import ChatSummary
 from chat_summary.game import Game
 from chat_summary.get_available_games import get_available_chat_games
 from chat_summary.messages import MessagesDB
-from chat_summary.update_readme import update_readme  # type: ignore
+from chat_summary.update_readme import update_readme  # pyright: ignore[reportUnusedImport]
 
 
 def main(argv: Sequence[str] | None = None) -> int:

@@ -4,7 +4,7 @@ from os import listdir
 from sqlite3 import OperationalError, connect
 from typing import Any, Generator, cast
 
-from pandas import read_sql_query  # type: ignore
+from pandas import read_sql_query  # pyright: ignore[reportUnknownVariableType]
 from pandas import DataFrame, Series
 
 from chat_summary.chat import MESSAGE, ChatMember
@@ -57,7 +57,7 @@ class MessagesDB:
                             return f"{address_source_path}/{dir}/{file}"
         raise FileNotFoundError
 
-    def _get_chat_members(self, chat_id: int):
+    def _get_chat_members(self, chat_id: int) -> list[ChatMember]:
         numbers: Series[str] = read_sql_query(
             f"""
             SELECT 
