@@ -35,7 +35,11 @@ class Connections(Game):
         self._update_range(number)
 
         lines = message.split("\n")
-        last_line, i = next((line, i) for i, line in enumerate(reversed(lines)) if line and line[0] in ("🟪", "🟦", "🟩", "🟨"))
+        try:
+            last_line, i = next((line, i) for i, line in enumerate(reversed(lines)) if line and line[0] in ("🟪", "🟦", "🟩", "🟨"))
+        except StopIteration:
+            return None
+    
         if all(square == last_line[0] for square in last_line):
             return RESULT(number, True, len(lines) - 2 - i)
 
