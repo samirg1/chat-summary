@@ -63,14 +63,14 @@ Where {game} is replaced by the game that there were no messages for.
 
 ### Errors
 
-- ```"invalid user, user not found"```
+- ```"iuser not found, user should be one of: ..."```
     - user parameter was invalid, check that you've spelt it correctly and that you are a valid user in the ```\Users``` directory
 -  ```"could not connect to messages database, ensure you have the right permissions to access file"```
-    - Ensure there is a `chat.db` file in `\Users\{your user}\Library\Messages`, if not your messages are not stored locally on your Mac, try logging in to iMessage on your Mac
     - Ensure you have the right permissions to view the `chat.db` by going System Preferences > Securiy & Privacy > Full Disk Access and ensure that Terminal (or whatever you are using to run the script) is ticked
-- ```"chat name not found"```
+- ```"could not find stored messages, ensure you have signed in and uploaded iMessages to iCloud"```
+    - Ensure there is a `chat.db` file in `\Users\{your user}\Library\Messages`, if not your messages are not stored locally on your Mac, try logging in to iMessage on your Mac and uploading the messages to iCloud
+- ```"chat name not found, should be one of: ..."```
     - you have entered an invalid chat_name argument that doesn't match up with any group chats you are currently in on iMessage
-    - ensure you've spelt this parameter correctly and that you can verify on your Mac's iMessage app that you can see this group chat
 - ```"unable to find contacts"```
     - not a destructive error, means that the program could not find contacts that were stored on your computer, so instead of displaying people's names it will instead display their phone numbers in the summary, silence this warning with the `--silence-contacts option`
     - the program will look for a `'AddressBook-v22.abcddb'` file somewhere in `'/Users/{your user}/Library/Application Support/AddressBook/Sources'`
