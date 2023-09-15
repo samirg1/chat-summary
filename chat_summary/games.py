@@ -5,7 +5,7 @@ from chat_summary.game import RESULT, Game
 
 class Wordle(Game):
     def _get_regex(self) -> str:
-        return r"Wordle (\d{2,3}) (1|2|3|4|5|6|X)/6"
+        return r"Wordle (\d{1,4}) (1|2|3|4|5|6|X)/6"
 
     def analyse_message(self, message: str) -> RESULT | None:
         matches = re.match(self._regex, message)
@@ -24,7 +24,7 @@ class Wordle(Game):
 
 class Connections(Game):
     def _get_regex(self) -> str:
-        return r"Connections \nPuzzle #(\d{1,3})"
+        return r"Connections \nPuzzle #(\d{1,4})"
 
     def analyse_message(self, message: str) -> RESULT | None:
         matches = re.match(self._regex, message)
@@ -35,7 +35,11 @@ class Connections(Game):
         self._update_range(number)
 
         lines = message.split("\n")
-        last_line, i = next((line, i) for i, line in enumerate(reversed(lines)) if line and line[0] in ("🟪", "🟦", "🟩", "🟨"))
+        try:
+            last_line, i = next((line, i) for i, line in enumerate(reversed(lines)) if line and line[0] in ("🟪", "🟦", "🟩", "🟨"))
+        except StopIteration:
+            return None
+
         if all(square == last_line[0] for square in last_line):
             return RESULT(number, True, len(lines) - 2 - i)
 
@@ -44,7 +48,7 @@ class Connections(Game):
 
 class Nerdle(Game):
     def _get_regex(self) -> str:
-        return r"nerdlegame (\d{2,3}) (1|2|3|4|5|6|X)/6"
+        return r"nerdlegame (\d{1,4}) (1|2|3|4|5|6|X)/6"
 
     def analyse_message(self, message: str) -> RESULT | None:
         matches = re.match(self._regex, message)
