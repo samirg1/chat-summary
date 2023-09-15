@@ -2,6 +2,8 @@
 
 Use this library to get a summary of results of internet games (like Wordle) in a group chat.
 
+![Tests](https://github.com/samirg1/ALTER-SMX-Tool/actions/workflows/tests.yml/badge.svg)
+
 ### Requirements
 - Only works on MacOS iMessages
 - Must have messages stored on iCloud (or on Mac)
