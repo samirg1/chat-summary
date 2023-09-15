@@ -1,9 +1,9 @@
+import os
 import sqlite3
 import sys
-import os
 from typing import Any, Generator, cast
 
-from pandas import read_sql_query  # pyright: ignore[reportUnknownVariableType]
+import pandas
 from pandas import DataFrame, Series
 
 from chat_summary.chat import MESSAGE, ChatMember
@@ -27,7 +27,7 @@ class MessagesDB:
             exit(1)
 
     def _select_chat_id(self) -> int:
-        chat_id = read_sql_query(
+        chat_id = pandas.read_sql_query(  # pyright: ignore[reportUnknownMemberType]
             f"""
             SELECT
                 ROWID
@@ -57,7 +57,7 @@ class MessagesDB:
         raise FileNotFoundError
 
     def _get_chat_members(self, chat_id: int) -> list[ChatMember]:
-        numbers: Series[str] = read_sql_query(
+        numbers: Series[str] = pandas.read_sql_query(  # pyright: ignore[reportUnknownMemberType]
             f"""
             SELECT 
                 id
@@ -82,7 +82,7 @@ class MessagesDB:
             address_path = self._get_addressbook_db_path()
             contacts_connection = sqlite3.connect(address_path)
 
-            all_contacts = read_sql_query(
+            all_contacts = pandas.read_sql_query(  # pyright: ignore[reportUnknownMemberType]
                 """
                 SELECT 
                     zfirstname, zlastname, zfullnumber
@@ -124,7 +124,7 @@ class MessagesDB:
         return chat_members
 
     def _get_messages(self, chat_id: int) -> Generator[MESSAGE, None, None]:
-        raw_messages = read_sql_query(
+        raw_messages = pandas.read_sql_query(  # pyright: ignore[reportUnknownMemberType]
             f"""
             SELECT  
                 text,
