@@ -6,6 +6,7 @@ from typing import Any
 import pandas
 import pytest
 
+from chat_summary.chat import MESSAGE
 from chat_summary.messages import MessagesDB
 
 
@@ -29,7 +30,14 @@ def mock_sql_connect(monkeypatch: pytest.MonkeyPatch, request: pytest.FixtureReq
     def f1():
         return "connections obj"
 
-    funcs = {0: f0, 1: f1}
+    def f2():
+        class f:
+            def close(self) -> None:
+                pass
+
+        return f()
+
+    funcs = {0: f0, 1: f1, 2: f2}
 
     info = [funcs[n] for n in reversed(request.param)]
 
@@ -63,16 +71,30 @@ def mock_read_sql_query(monkeypatch: pytest.MonkeyPatch, request: pytest.Fixture
 
 
 class MockObj:
-    def __init__(self, empty: bool = False, getitem: dict[str, Any] | None = None) -> None:
+    class _iloc:
+        def __init__(self, len: int) -> None:
+            self.len = len
+
+        def __getitem__(self, v: tuple[int, slice]):
+            if self.len == 3:
+                return f"{v[0]}", f"{v[0]}", "0123"
+            return f"{v[0]}", "0123"
+
+    def __init__(self, empty: bool = False, getitem: dict[str, Any] | None = None, len: int = 3) -> None:
         self.is_empty = empty
         self.getitem = getitem
+        self.len = len
+        self.iloc = self._iloc(len)
 
     @property
     def empty(self) -> bool:
         return self.is_empty
-    
-    def __getitem__(self, value: str): # type: ignore
-        return self.getitem[value] # type: ignore
+
+    def __getitem__(self, value: str):  # type: ignore
+        return self.getitem[value]  # type: ignore
+
+    def __len__(self) -> int:
+        return self.len
 
 
 @pytest.mark.parametrize("mock_listdir", ([[""]]), indirect=True)
@@ -157,3 +179,33 @@ def test_addressbook_fail_silenced(mock_listdir: None, mock_read_sql_query: None
     with pytest.raises(SystemExit):
         m.get_messages_members_from_chat()
     assert capture_std_err["err"] == ""
+
+
+@pytest.mark.parametrize(
+    ("mock_listdir", "mock_read_sql_query", "mock_sql_connect"),
+    [
+        ([["user"], ["x"], ["AddressBook-v22.abcddb"]], [MockObj(getitem={"id": ["+61123", "345"]}), MockObj(getitem={"id": ["0123", "345"]})], [1, 2]),
+    ],
+    indirect=True,
+)
+def test_chat_members(mock_listdir: None, mock_read_sql_query: None, mock_sql_connect: None):
+    m = MessagesDB("user", "1", False)
+    members = m._get_chat_members(1)  # pyright: ignore[reportPrivateUsage]
+    assert members[0].name == "0" and members[0].number == "+61123"
+    assert members[1].name == "345" and members[1].number == "345"
+    assert members[2].name == "user" and members[2].number == ""
+
+
+@pytest.mark.parametrize(
+    ("mock_listdir", "mock_read_sql_query", "mock_sql_connect"),
+    [
+        ([["user"], []], [MockObj(getitem={"ROWID": [0]}), MockObj(getitem={"id": []}), MockObj(len=2)], [1]),
+    ],
+    indirect=True,
+)
+def test_full_runthrough(mock_listdir: None, mock_read_sql_query: None, mock_sql_connect: None, capture_std_err: dict[str, str]):
+    m = MessagesDB("user", "1", False)
+
+    res = m.get_messages_members_from_chat()
+    assert list(res[0]) == [MESSAGE("0", "0123"), MESSAGE("1", "0123")]
+    assert len(res[1]) == 1 and res[1][0].name == "user" and res[1][0].number == ""
