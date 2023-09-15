@@ -4,7 +4,7 @@ from typing import Sequence
 from chat_summary.chat import ChatSummary
 from chat_summary.game import Game
 from chat_summary.get_available_games import get_available_chat_games
-import chat_summary.messages  as chat_summary_messages
+import chat_summary.messages as chat_summary_messages
 from chat_summary.update_readme import update_readme  # pyright: ignore[reportUnusedImport]
 
 
@@ -15,7 +15,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     argparser.add_argument("--silence-contacts", action="store_true", help="silence the 'unable to find contacts' error")
     for name, game in get_available_chat_games():
         argparser.add_argument(f"-{name[0]}", f"--{name}", dest="games", action="append_const", const=game)
-    
+
     args = argparser.parse_args(argv)
 
     games: list[Game] = list(set(args.games or []))

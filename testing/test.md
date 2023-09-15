@@ -1,4 +1,4 @@
-# chat_summary
+# chat-summary
 
 Use this library to get a summary of results of internet games (like Wordle) in a group chat.
 
@@ -12,12 +12,12 @@ Use this library to get a summary of results of internet games (like Wordle) in 
 
 ### Installation 
 ```python
-pip install chat_summary 
+pip install chat-summary 
 ```
 
 ### Usage
 ```python
-chat_summary user chat_name [options]
+chat-summary user chat_name [options]
 ```
 
 #### Options
