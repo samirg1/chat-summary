@@ -1,11 +1,10 @@
 import argparse
 from typing import Sequence
 
+import chat_summary.messages as chat_summary_messages
 from chat_summary.chat import ChatSummary
 from chat_summary.game import Game
 from chat_summary.get_available_games import get_available_chat_games
-import chat_summary.messages as chat_summary_messages
-from chat_summary.update_readme import update_readme  # pyright: ignore[reportUnusedImport]
 
 
 def main(argv: Sequence[str] | None = None) -> int:
