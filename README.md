@@ -63,7 +63,7 @@ Where {game} is replaced by the game that there were no messages for.
 
 ### Errors
 
-- ```"iuser not found, user should be one of: ..."```
+- ```"user not found, user should be one of: ..."```
     - user parameter was invalid, check that you've spelt it correctly and that you are a valid user in the ```\Users``` directory
 -  ```"could not connect to messages database, ensure you have the right permissions to access file"```
     - Ensure you have the right permissions to view the `chat.db` by going System Preferences > Securiy & Privacy > Full Disk Access and ensure that Terminal (or whatever you are using to run the script) is ticked
