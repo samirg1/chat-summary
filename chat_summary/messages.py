@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import sys
-from typing import Any, Generator, cast
+from typing import Generator, cast
 
 import pandas
 from pandas import DataFrame, Series
@@ -16,35 +16,42 @@ class MessagesDB:
         self._display_name = user
         self.silence_contact_error = silence_contact_error
 
-        if user not in os.listdir("/Users"):
-            print("invalid user, user not found", file=sys.stderr)
+        users = os.listdir("/Users")
+        if user not in users:
+            potential_users = ", ".join(f"'{user}'" for user in users if not user.startswith("."))
+            print(f"user not found, user should be one of: {potential_users}", file=sys.stderr)
             exit(1)
 
         try:
             self._connection = sqlite3.connect(f"/Users/{user}/Library/Messages/chat.db")
-        except (sqlite3.OperationalError, FileNotFoundError):
+        except sqlite3.OperationalError:
             print("could not connect to messages database, ensure you have the right permissions to access file", file=sys.stderr)
+            exit(1)
+        except FileNotFoundError:
+            print("could not find stored messages, ensure you have signed in and uploaded iMessages to iCloud", file=sys.stderr)
             exit(1)
 
     def _select_chat_id(self) -> int:
-        chat_id = pandas.read_sql_query(  # pyright: ignore[reportUnknownMemberType]
+        chats = pandas.read_sql_query(  # pyright: ignore[reportUnknownMemberType]
             f"""
             SELECT
-                ROWID
+                ROWID, display_name
             FROM
                 chat
             WHERE
-                display_name == "{self._chat_name}"
+               display_name != "" 
             """,
             self._connection,
         )
 
-        if chat_id.empty:
-            print("chat name not found", file=sys.stderr)
+        rows: Series[int] = chats["ROWID"]
+        chat_names: Series[str] = chats["display_name"]
+        try:
+            return next(row_id for row_id, name in zip(rows, chat_names) if name == self._chat_name)  # type: ignore[no-any-return]
+        except StopIteration:
+            potential_chats = ", ".join(set(f"'{name}'" for name in chat_names))
+            print(f"chat name not found, should be one of: {potential_chats}", file=sys.stderr)
             exit(1)
-
-        items = cast(dict[Any, list[int]], chat_id)
-        return items["ROWID"][0]
 
     def _get_addressbook_db_path(self) -> str:
         address_source_path = f"/Users/{self._user}/Library/Application Support/AddressBook/Sources"  # base path
@@ -118,7 +125,7 @@ class MessagesDB:
                     break
 
             else:  # if we did not find a contact, set the contact name to just the number
-                chat_members.append(ChatMember(number, number))  # pragma: no cover
+                chat_members.append(ChatMember(number, number))
 
         chat_members.append(ChatMember(self._display_name, ""))
         return chat_members

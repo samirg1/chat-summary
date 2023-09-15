@@ -37,7 +37,10 @@ def mock_sql_connect(monkeypatch: pytest.MonkeyPatch, request: pytest.FixtureReq
 
         return f()
 
-    funcs = {0: f0, 1: f1, 2: f2}
+    def f3():
+        raise FileNotFoundError
+
+    funcs = {0: f0, 1: f1, 2: f2, 3: f3}
 
     info = [funcs[n] for n in reversed(request.param)]
 
@@ -80,15 +83,10 @@ class MockObj:
                 return f"{v[0]}", f"{v[0]}", "0123"
             return f"{v[0]}", "0123"
 
-    def __init__(self, empty: bool = False, getitem: dict[str, Any] | None = None, len: int = 3) -> None:
-        self.is_empty = empty
+    def __init__(self, *, getitem: dict[str, Any] | None = None, len: int = 3) -> None:
         self.getitem = getitem
         self.len = len
         self.iloc = self._iloc(len)
-
-    @property
-    def empty(self) -> bool:
-        return self.is_empty
 
     def __getitem__(self, value: str):  # type: ignore
         return self.getitem[value]  # type: ignore
@@ -102,7 +100,7 @@ def test_no_user_found(mock_listdir: None, capture_std_err: dict[str, str]):
     with pytest.raises(SystemExit) as sys_exit:
         MessagesDB("user", "", False)
     assert sys_exit.value.code == 1
-    assert capture_std_err["err"] == "invalid user, user not found\n"
+    assert capture_std_err["err"].startswith("user not found, user should be one of: ")
 
 
 @pytest.mark.parametrize(("mock_listdir", "mock_sql_connect"), [([["user"]], [0])], indirect=True)
@@ -112,11 +110,17 @@ def test_operational_error(mock_listdir: None, mock_sql_connect: None, capture_s
     assert sys_exit.value.code == 1
     assert capture_std_err["err"] == "could not connect to messages database, ensure you have the right permissions to access file\n"
 
+@pytest.mark.parametrize(("mock_listdir", "mock_sql_connect"), [([["user"]], [3])], indirect=True)
+def test_filenotfound_error(mock_listdir: None, mock_sql_connect: None, capture_std_err: dict[str, str]):
+    with pytest.raises(SystemExit) as sys_exit:
+        MessagesDB("user", "", False)
+    assert sys_exit.value.code == 1
+    assert capture_std_err["err"] == "could not find stored messages, ensure you have signed in and uploaded iMessages to iCloud\n"
 
 @pytest.mark.parametrize(
     ("mock_listdir", "mock_read_sql_query", "mock_sql_connect"),
     [
-        ([["user"]], [MockObj(True)], [1]),
+        ([["user"]], [MockObj(getitem={"ROWID": [], "display_name": []})], [1]),
     ],
     indirect=True,
 )
@@ -125,7 +129,7 @@ def test_failed_chat_name(mock_listdir: None, mock_read_sql_query: None, mock_sq
     with pytest.raises(SystemExit) as sys_exit:
         messagedb.get_messages_members_from_chat()
     assert sys_exit.value.code == 1
-    assert capture_std_err["err"] == "chat name not found\n"
+    assert capture_std_err["err"].startswith("chat name not found, should be one of: ")
 
 
 @pytest.mark.parametrize(
@@ -156,7 +160,7 @@ def test_addressbook_path(mock_listdir: None, mock_sql_connect: None):
 @pytest.mark.parametrize(
     ("mock_listdir", "mock_read_sql_query", "mock_sql_connect"),
     [
-        ([["user"], []], [MockObj(getitem={"ROWID": [0]}), MockObj(getitem={"id": []}), SystemExit()], [1]),
+        ([["user"], []], [MockObj(getitem={"ROWID": [0], "display_name": ["1"]}), MockObj(getitem={"id": []}), SystemExit()], [1]),
     ],
     indirect=True,
 )
@@ -170,7 +174,7 @@ def test_addressbook_fail(mock_listdir: None, mock_read_sql_query: None, mock_sq
 @pytest.mark.parametrize(
     ("mock_listdir", "mock_read_sql_query", "mock_sql_connect"),
     [
-        ([["user"], []], [MockObj(getitem={"ROWID": [0]}), MockObj(getitem={"id": []}), SystemExit()], [1]),
+        ([["user"], []], [MockObj(getitem={"ROWID": [0], "display_name": ["1"]}), MockObj(getitem={"id": []}), SystemExit()], [1]),
     ],
     indirect=True,
 )
@@ -199,7 +203,7 @@ def test_chat_members(mock_listdir: None, mock_read_sql_query: None, mock_sql_co
 @pytest.mark.parametrize(
     ("mock_listdir", "mock_read_sql_query", "mock_sql_connect"),
     [
-        ([["user"], []], [MockObj(getitem={"ROWID": [0]}), MockObj(getitem={"id": []}), MockObj(len=2)], [1]),
+        ([["user"], []], [MockObj(getitem={"ROWID": [0], "display_name": ["1"]}), MockObj(getitem={"id": []}), MockObj(len=2)], [1]),
     ],
     indirect=True,
 )
