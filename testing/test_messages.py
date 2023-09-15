@@ -102,7 +102,7 @@ def test_no_user_found(mock_listdir: None, capture_std_err: dict[str, str]):
     with pytest.raises(SystemExit) as sys_exit:
         MessagesDB("user", "", False)
     assert sys_exit.value.code == 1
-    assert capture_std_err["err"] == "invalid user, user not found\n"
+    assert capture_std_err["err"].startswith("user not found, user should be one of: ")
 
 
 @pytest.mark.parametrize(("mock_listdir", "mock_sql_connect"), [([["user"]], [0])], indirect=True)

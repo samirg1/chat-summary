@@ -16,8 +16,10 @@ class MessagesDB:
         self._display_name = user
         self.silence_contact_error = silence_contact_error
 
-        if user not in os.listdir("/Users"):
-            print("invalid user, user not found", file=sys.stderr)
+        users = os.listdir("/Users")
+        if user not in users:
+            potential_users = ', '.join(f"'{user}'" for user in users if not user.startswith("."))
+            print(f"user not found, user should be one of: {potential_users}", file=sys.stderr)
             exit(1)
 
         try:
