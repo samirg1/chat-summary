@@ -5,10 +5,10 @@ Use this library to get a summary of results of internet games (like Wordle) in 
 ![Tests](https://github.com/samirg1/ALTER-SMX-Tool/actions/workflows/tests.yml/badge.svg)
 
 ### Requirements
-- Only works on MacOS iMessages
-- Must have messages stored on iCloud (or on Mac)
+- Only works on MacOS with iMessages
+- Must have messages stored in iCloud (or simply on Mac)
 - Only works for group chats
-- Having contacts synced to your Mac is not essential but allows for better viewage of results
+- Having contacts synced to your Mac as well is not essential but allows for better viewage of results
 
 ### Installation 
 ```python
@@ -21,7 +21,7 @@ chat-summary user chat_name [options]
 ```
 
 #### Options
-- user (required): The name of the user ('your user' from above)
+- user (required): The name of the user with the messages
 - chat_name (required): The name given to the messages group chat
 - --silence-contacts: Silecne the "unable to find contacts" error
 - '-C', '--Connections': Include the 'Connections' game in the results
@@ -29,7 +29,7 @@ chat-summary user chat_name [options]
 - '-W', '--Wordle': Include the 'Wordle' game in the results
 
 ### Output
-If all goes well, for each game you opt-in to you will be shown an output like this:
+For each game you opt-in to you will be shown an output like this:
 ```
 🟨🟨🟨 {game} 🟨🟨🟨
 
@@ -72,7 +72,7 @@ Where {game} is replaced by the game that there were no messages for.
 - ```"chat name not found, should be one of: ..."```
     - you have entered an invalid chat_name argument that doesn't match up with any group chats you are currently in on iMessage
 - ```"unable to find contacts"```
-    - not a destructive error, means that the program could not find contacts that were stored on your computer, so instead of displaying people's names it will instead display their phone numbers in the summary, silence this warning with the `--silence-contacts option`
+    - not a destructive error, means that the program could not find contacts that were stored on your computer, so instead of displaying people's names it will instead display their phone numbers in the summary, silence this warning with the `--silence-contacts` option
     - the program will look for a `'AddressBook-v22.abcddb'` file somewhere in `'/Users/{your user}/Library/Application Support/AddressBook/Sources'`
 
 ### Add your own!
