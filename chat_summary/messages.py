@@ -24,8 +24,11 @@ class MessagesDB:
 
         try:
             self._connection = sqlite3.connect(f"/Users/{user}/Library/Messages/chat.db")
-        except (sqlite3.OperationalError, FileNotFoundError):
+        except sqlite3.OperationalError:
             print("could not connect to messages database, ensure you have the right permissions to access file", file=sys.stderr)
+            exit(1)
+        except FileNotFoundError:
+            print("could not find stored messages, ensure you have signed in and uploaded iMessages to iCloud", file=sys.stderr)
             exit(1)
 
     def _select_chat_id(self) -> int:
