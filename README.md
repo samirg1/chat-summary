@@ -15,19 +15,19 @@ Use this library to get a summary of results of internet games (like Wordle) in 
 - Having [contacts synced](https://support.apple.com/en-au/101336) to your Mac as well is not essential but allows for better viewage of results
 
 ### Installation
-```python
+```
 pip install chat-summary
 ```
 
 ### Usage
-```python
+```
 chat-summary user chat_name [options]
 ```
 
 #### Options
 - user (required): The name of the user with the messages
 - chat_name (required): The name given to the messages group chat
-- --silence-contacts: Silecne the "unable to find contacts" error
+- --silence-contacts: Silence the "unable to find contacts" error
 - '-C', '--Connections': Include the 'Connections' game in the results
 - '-N', '--Nerdle': Include the 'Nerdle' game in the results
 - '-W', '--Wordle': Include the 'Wordle' game in the results
@@ -70,7 +70,7 @@ Where {game} is replaced by the game that there were no messages for.
 - ```"user not found, user should be one of: ..."```
     - user parameter was invalid, check that you've spelt it correctly and that you are a valid user in the ```\Users``` directory
 -  ```"could not connect to messages database, ensure you have the right permissions to access file"```
-    - Ensure you have the right permissions to view the `chat.db` by going System Preferences > Securiy & Privacy > Full Disk Access and ensure that Terminal (or whatever you are using to run the script) is ticked
+    - Ensure you have the right permissions to view the `chat.db` by going System Preferences > Security & Privacy > Full Disk Access and ensure that Terminal (or whatever you are using to run the script) is ticked
 - ```"could not find stored messages, ensure you have signed in and uploaded iMessages to iCloud"```
     - Ensure there is a `chat.db` file in `\Users\{your user}\Library\Messages`, if not your messages are not stored locally on your Mac, try logging in to iMessage on your Mac and [uploading the messages to iCloud](https://support.apple.com/en-au/guide/messages/icht5b5d1e63/mac#:~:text=In%20the%20Messages%20app%20on,all%20of%20them%20to%20appear.)
 - ```"chat name not found, should be one of: ..."```
