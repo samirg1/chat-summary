@@ -81,13 +81,4 @@ Where {game} is replaced by the game that there were no messages for.
 
 ### Add your own!
 
-If you have your own internet games that are not currently supported raise an issue with the following information and it will be implemented as soon as possible.
-
-Title: New Game - {title of game}
-
-Description:
-- Name of the game
-- Example output to look for in messages
-- How to determine if the player has won or not
-- How to determine how many guesses the player has guesses (if not obvious)
-- How to determine the game number
+If you have your own internet games that are similar to Wordle and are not currently supported [raise an issue](https://github.com/samirg1/chat-summary/issues/new?assignees=samirg1&labels=new-game&projects=&template=new-game.md&title=%5BNew+Game%5D)  and it will be implemented as soon as possible.
