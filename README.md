@@ -3,16 +3,20 @@
 Use this library to get a summary of results of internet games (like Wordle) in a group chat.
 
 ![Tests](https://github.com/samirg1/ALTER-SMX-Tool/actions/workflows/tests.yml/badge.svg)
+![python](https://img.shields.io/pypi/pyversions/chat-summary?logo=python)
+![pypi](https://img.shields.io/pypi/v/chat-summary?logo=pypi)
+![downloads](https://static.pepy.tech/badge/chat-summary)
+![code style](https://img.shields.io/badge/code%20style-black-000000.svg)
 
 ### Requirements
 - Only works on MacOS with iMessages
-- Must have messages stored in iCloud (or simply on Mac)
+- Must have messages [stored in iCloud](https://support.apple.com/en-au/guide/messages/icht5b5d1e63/mac#:~:text=In%20the%20Messages%20app%20on,all%20of%20them%20to%20appear.) (or simply on Mac)
 - Only works for group chats
-- Having contacts synced to your Mac as well is not essential but allows for better viewage of results
+- Having [contacts synced](https://support.apple.com/en-au/101336) to your Mac as well is not essential but allows for better viewage of results
 
-### Installation 
+### Installation
 ```python
-pip install chat-summary 
+pip install chat-summary
 ```
 
 ### Usage
@@ -68,7 +72,7 @@ Where {game} is replaced by the game that there were no messages for.
 -  ```"could not connect to messages database, ensure you have the right permissions to access file"```
     - Ensure you have the right permissions to view the `chat.db` by going System Preferences > Securiy & Privacy > Full Disk Access and ensure that Terminal (or whatever you are using to run the script) is ticked
 - ```"could not find stored messages, ensure you have signed in and uploaded iMessages to iCloud"```
-    - Ensure there is a `chat.db` file in `\Users\{your user}\Library\Messages`, if not your messages are not stored locally on your Mac, try logging in to iMessage on your Mac and uploading the messages to iCloud
+    - Ensure there is a `chat.db` file in `\Users\{your user}\Library\Messages`, if not your messages are not stored locally on your Mac, try logging in to iMessage on your Mac and [uploading the messages to iCloud](https://support.apple.com/en-au/guide/messages/icht5b5d1e63/mac#:~:text=In%20the%20Messages%20app%20on,all%20of%20them%20to%20appear.)
 - ```"chat name not found, should be one of: ..."```
     - you have entered an invalid chat_name argument that doesn't match up with any group chats you are currently in on iMessage
 - ```"unable to find contacts"```
@@ -77,13 +81,4 @@ Where {game} is replaced by the game that there were no messages for.
 
 ### Add your own!
 
-If you have your own internet games that are not currently supported raise an issue with the following information and it will be implemented as soon as possible.
-
-Title: New Game - {title of game}
-
-Description:
-- Name of the game
-- Example output to look for in messages
-- How to determine if the player has won or not
-- How to determine how many guesses the player has guesses (if not obvious)
-- How to determine the game number
+If you have your own internet games that are similar to Wordle and are not currently supported [raise an issue](https://github.com/samirg1/chat-summary/issues/new?assignees=samirg1&labels=new-game&projects=&template=new-game.md&title=%5BNew+Game%5D)  and it will be implemented as soon as possible.
