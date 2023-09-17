@@ -3,6 +3,10 @@
 Use this library to get a summary of results of internet games (like Wordle) in a group chat.
 
 ![Tests](https://github.com/samirg1/ALTER-SMX-Tool/actions/workflows/tests.yml/badge.svg)
+![python](https://img.shields.io/pypi/pyversions/chat-summary?logo=python)
+![pypi](https://img.shields.io/pypi/v/chat-summary?logo=pypi)
+![downloads](https://static.pepy.tech/badge/chat-summary)
+![code style](https://img.shields.io/badge/code%20style-black-000000.svg)
 
 ### Requirements
 - Only works on MacOS with iMessages
