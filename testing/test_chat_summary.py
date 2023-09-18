@@ -1,3 +1,4 @@
+import io
 import subprocess
 from typing import Any
 
@@ -104,6 +105,17 @@ def test_different_combination_of_options(options: list[str], mock_messagesdb: d
 
 
 @pytest.mark.parametrize("mock_check_call", [False], indirect=True)
-def test_send_message(mock_messagesdb: dict[str, MockMessagesDB], mock_check_call: dict[str, list[str]], capsys: pytest.CaptureFixture[str]):
+def test_send_message_confirm(mock_messagesdb: dict[str, MockMessagesDB], mock_check_call: dict[str, list[str]], capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr("sys.stdin", io.StringIO("Y"))
     main(["user", "chat_name", "-W", "--send-message"])
-    assert capsys.readouterr().out == "message sent successfully!\n"
+    assert capsys.readouterr().out == "are you sure you want to send the message? (Y): message sent successfully!\n"
+    assert mock_check_call["args"]
+    assert "chat_name" in mock_check_call["args"][2]
+
+
+@pytest.mark.parametrize("mock_check_call", [False], indirect=True)
+def test_send_message_decline(mock_messagesdb: dict[str, MockMessagesDB], mock_check_call: dict[str, list[str]], capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr("sys.stdin", io.StringIO("not Y"))
+    main(["user", "chat_name", "-W", "--send-message"])
+    assert capsys.readouterr().out == "are you sure you want to send the message? (Y): "
+    assert not mock_check_call["args"]

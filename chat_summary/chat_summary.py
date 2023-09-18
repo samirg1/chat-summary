@@ -30,7 +30,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     summary = chat_summary.get_display()
 
     if args.send_message:
-        send_message("Test", summary)
+        if input("are you sure you want to send the message? (Y): ") == "Y":
+            send_message(args.chat_name, summary)
     else:
         print(summary)
 
