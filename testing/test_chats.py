@@ -68,7 +68,7 @@ class Game3(Game):
 
 
 @pytest.fixture
-def get_captured_display(capfd: pytest.CaptureFixture[str], chat_summary: ChatSummary):
+def get_captured_display(capfd: pytest.CaptureFixture[str], chat_summary: ChatSummary) -> str:
     messages = [
         MESSAGE("Game1 message", "1234567890"),
         MESSAGE("Game1 message", "1234567890"),
@@ -80,8 +80,7 @@ def get_captured_display(capfd: pytest.CaptureFixture[str], chat_summary: ChatSu
     ]
     chat_summary.populate(messages)
 
-    chat_summary.display()
-    return capfd.readouterr().out
+    return chat_summary.get_display()
 
 
 @pytest.mark.parametrize("text", ("GAME1", "GAME2", "John", "Alice", "3/4", "2/2", "Game3", "2.00", "3.00"))

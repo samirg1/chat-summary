@@ -26,7 +26,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     chat_summary = ChatSummary(members, tuple(games))
     chat_summary.populate(messages)
-    chat_summary.display()
+    print(chat_summary.get_display())
 
     return 0
 

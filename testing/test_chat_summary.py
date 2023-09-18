@@ -42,7 +42,7 @@ def mock_messagesdb(monkeypatch: pytest.MonkeyPatch):
 )
 def test_chat_summary(user: str, chat_name: str, options: list[str], mock_messagesdb: dict[str, MockMessagesDB], capsys: pytest.CaptureFixture[str]):
     main([user, chat_name, *options])
-    assert capsys.readouterr().out == "🟥 no 'Connections' messages found 🟥\n🟥 no 'Nerdle' messages found 🟥\n🟥 no 'Wordle' messages found 🟥\n"
+    assert capsys.readouterr().out == "🟥 no 'Connections' messages found 🟥\n🟥 no 'Nerdle' messages found 🟥\n🟥 no 'Wordle' messages found 🟥\n\n"
     assert mock_messagesdb["obj"].chat_name == chat_name
     assert mock_messagesdb["obj"].user == user
     assert mock_messagesdb["obj"].silence == False
@@ -66,7 +66,7 @@ def expected_out_from_combination(options: list[str]) -> str:
         name = "Connections" if option == "-C" else "Wordle" if option == "-W" else "Nerdle"
         out += f"🟥 no '{name}' messages found 🟥\n"
 
-    return out
+    return out + "\n"
 
 
 @pytest.mark.parametrize(
