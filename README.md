@@ -28,6 +28,7 @@ chat-summary user chat_name [options]
 - user (required): The name of the user with the messages
 - chat_name (required): The name given to the messages group chat
 - --silence-contacts: Silence the "unable to find contacts" error
+- --send-message: Instead of printing the summary, send it directly back to the group chat
 - '-C', '--Connections': Include the 'Connections' game in the results
 - '-N', '--Nerdle': Include the 'Nerdle' game in the results
 - '-W', '--Wordle': Include the 'Wordle' game in the results
@@ -63,7 +64,7 @@ If there are no messages for a particular game that you have opted-in to you wil
 ```
 🟥 no '{game}' messages found 🟥
 ```
-Where {game} is replaced by the game that there were no messages for.
+Where {game} is replaced by the game that there were no messages for. This will only be displayed in the terminal.
 
 ### Errors
 
@@ -78,6 +79,11 @@ Where {game} is replaced by the game that there were no messages for.
 - ```"unable to find contacts"```
     - not a destructive error, means that the program could not find contacts that were stored on your computer, so instead of displaying people's names it will instead display their phone numbers in the summary, silence this warning with the `--silence-contacts` option
     - the program will look for a `'AddressBook-v22.abcddb'` file somewhere in `'/Users/{your user}/Library/Application Support/AddressBook/Sources'`
+- ```"empty message, no message sent"```
+    - you are attempting to send an empty message to the group chat, this usually occurs when you are using the `--send-message` flag and have either not opted-in to any of the games or no games were found in the messages
+- ```"unable to send message to group chat"```
+    - a subprocess error occured whilst sending the message
+    - ensure you have access to `osascript` in your terminal and that the terminal has full access to files and to iMessage in your System Preferences
 
 ### Add your own!
 
