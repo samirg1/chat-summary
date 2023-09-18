@@ -1,5 +1,6 @@
 import io
 from math import inf
+import sys
 from typing import Iterable, NamedTuple
 
 from chat_summary.game import Game, GameScore
@@ -49,7 +50,7 @@ class ChatSummary:
             game_name = type(game).__name__
             total_days = game.range
             if total_days == 0:
-                out.write(f"🟥 no '{game_name}' messages found 🟥\n")
+                print(f"🟥 no '{game_name}' messages found 🟥", file=sys.stderr)
                 continue
 
             out.write(f"\n🟨🟨🟨 {game_name.upper()} 🟨🟨🟨\n\n")
