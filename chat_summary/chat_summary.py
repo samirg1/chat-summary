@@ -5,6 +5,7 @@ import chat_summary.messages as chat_summary_messages
 from chat_summary.chat import ChatSummary
 from chat_summary.game import Game
 from chat_summary.get_available_games import get_available_chat_games
+from chat_summary.send_message import send_message
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -26,7 +27,12 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     chat_summary = ChatSummary(members, tuple(games))
     chat_summary.populate(messages)
-    print(chat_summary.get_display())
+    summary = chat_summary.get_display()
+
+    if args.send_message:
+        send_message("Test", summary)
+    else:
+        print(summary)
 
     return 0
 

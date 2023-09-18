@@ -1,3 +1,4 @@
+import subprocess
 from typing import Any
 
 import pytest
@@ -29,6 +30,20 @@ def mock_messagesdb(monkeypatch: pytest.MonkeyPatch):
     return value
 
 
+@pytest.fixture
+def mock_check_call(monkeypatch: pytest.MonkeyPatch, request: pytest.FixtureRequest) -> dict[str, list[str]]:
+    buffer: dict[str, list[str]] = {"args": []}
+
+    def check_call(args: list[str]) -> None:
+        if request.param:
+            raise subprocess.CalledProcessError(1, "")
+        buffer["args"] += args
+
+    monkeypatch.setattr(subprocess, "check_call", check_call)
+
+    return buffer
+
+
 @pytest.mark.parametrize(
     ("user", "chat_name", "options"),
     (
@@ -40,12 +55,13 @@ def mock_messagesdb(monkeypatch: pytest.MonkeyPatch):
         ("user1", "chat3", ["-W", "-C", "--Nerdle", "-N"]),
     ),
 )
-def test_chat_summary(user: str, chat_name: str, options: list[str], mock_messagesdb: dict[str, MockMessagesDB], capsys: pytest.CaptureFixture[str]):
+def test_chat_summary(user: str, chat_name: str, options: list[str], mock_messagesdb: dict[str, MockMessagesDB], capsys: pytest.CaptureFixture[str], mock_check_call: dict[str, list[str]]):
     main([user, chat_name, *options])
     assert capsys.readouterr().out == "🟥 no 'Connections' messages found 🟥\n🟥 no 'Nerdle' messages found 🟥\n🟥 no 'Wordle' messages found 🟥\n\n"
     assert mock_messagesdb["obj"].chat_name == chat_name
     assert mock_messagesdb["obj"].user == user
     assert mock_messagesdb["obj"].silence == False
+    assert mock_check_call["args"] == []
 
 
 @pytest.mark.parametrize(("options", "expected"), ((["--silence-contacts"], True), ([], False)))
@@ -85,3 +101,9 @@ def expected_out_from_combination(options: list[str]) -> str:
 def test_different_combination_of_options(options: list[str], mock_messagesdb: dict[str, MockMessagesDB], capsys: pytest.CaptureFixture[str]):
     main(["user", "chat_name", *options])
     assert capsys.readouterr().out == expected_out_from_combination(options)
+
+
+@pytest.mark.parametrize("mock_check_call", [False], indirect=True)
+def test_send_message(mock_messagesdb: dict[str, MockMessagesDB], mock_check_call: dict[str, list[str]], capsys: pytest.CaptureFixture[str]):
+    main(["user", "chat_name", "-W", "--send-message"])
+    assert capsys.readouterr().out == "message sent successfully!\n"
