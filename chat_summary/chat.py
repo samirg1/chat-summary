@@ -1,4 +1,6 @@
+import io
 from math import inf
+import sys
 from typing import Iterable, NamedTuple
 
 from chat_summary.game import Game, GameScore
@@ -42,33 +44,36 @@ class ChatSummary:
                     continue
                 member.game_scores[type(game).__name__].add(result)
 
-    def display(self) -> None:
+    def get_display(self) -> str:
+        out = io.StringIO()
         for i, game in enumerate(self._games):
             game_name = type(game).__name__
             total_days = game.range
             if total_days == 0:
-                print(f"🟥 no '{game_name}' messages found 🟥")
+                print(f"🟥 no '{game_name}' messages found 🟥", file=sys.stderr)
                 continue
 
-            print(f"\n🟨🟨🟨 {game_name.upper()} 🟨🟨🟨\n")
+            out.write(f"\n🟨🟨🟨 {game_name.upper()} 🟨🟨🟨\n\n")
 
             max_name_length = len(max(self._members, key=lambda user: len(user.name)).name)  # get the length of the longest name
 
             self._members.sort(key=lambda member: member.game_scores[game_name].completed, reverse=True)
-            print(f"COMPLETIONS ({total_days} days)")  # print completion summary
+            out.write(f"COMPLETIONS ({total_days} days)\n")
             for j, member in enumerate(self._members, start=1):
                 game_score = member.game_scores[game_name]
                 if game_score.completed == 0:
                     continue
-                print(f"{j}. {member.name:.<{max_name_length}}..{game_score.completed}/{game_score.attempts}")
+                out.write(f"{j}. {member.name:.<{max_name_length}}..{game_score.completed}/{game_score.attempts}\n")
 
             self._members.sort(key=lambda member: inf if member.game_scores[game_name].average_guesses == 0 else member.game_scores[game_name].average_guesses)
-            print("\nAVERAGE GUESSES")  # print average guess summary
+            out.write("\nAVERAGE GUESSES\n")
             for k, member in enumerate(self._members, start=1):
                 game_score = member.game_scores[game_name]
                 if game_score.average_guesses == 0:
                     continue
-                print(f"{k}. {member.name:.<{max_name_length}}..{game_score.average_guesses:.2f}")
+                out.write(f"{k}. {member.name:.<{max_name_length}}..{game_score.average_guesses:.2f}\n")
 
             if i != len(self._games) - 1:
-                print()
+                out.write("\n")
+
+        return out.getvalue()
