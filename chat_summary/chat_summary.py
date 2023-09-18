@@ -12,6 +12,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     argparser.add_argument("user", help="user's login name")
     argparser.add_argument("chat_name", help="name of chat to get summary of")
     argparser.add_argument("--silence-contacts", action="store_true", help="silence the 'unable to find contacts' error")
+    argparser.add_argument("--send-message", action="store_true", help="send results back to group chat")
     for name, game in get_available_chat_games():
         argparser.add_argument(f"-{name[0]}", f"--{name}", dest="games", action="append_const", const=game)
 
