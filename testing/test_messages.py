@@ -110,12 +110,14 @@ def test_operational_error(mock_listdir: None, mock_sql_connect: None, capture_s
     assert sys_exit.value.code == 1
     assert capture_std_err["err"] == "could not connect to messages database, ensure you have the right permissions to access file\n"
 
+
 @pytest.mark.parametrize(("mock_listdir", "mock_sql_connect"), [([["user"]], [3])], indirect=True)
 def test_filenotfound_error(mock_listdir: None, mock_sql_connect: None, capture_std_err: dict[str, str]):
     with pytest.raises(SystemExit) as sys_exit:
         MessagesDB("user", "", False)
     assert sys_exit.value.code == 1
     assert capture_std_err["err"] == "could not find stored messages, ensure you have signed in and uploaded iMessages to iCloud\n"
+
 
 @pytest.mark.parametrize(
     ("mock_listdir", "mock_read_sql_query", "mock_sql_connect"),

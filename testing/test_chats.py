@@ -30,6 +30,12 @@ def chat_summary():
 class Game1(Game):
     prev = 1
 
+    def get_display_emojis(self) -> str:
+        return "🟨⬛🟩"
+
+    def get_score_title(self) -> str:
+        return "Game1"
+
     def _get_regex(self) -> str:
         return "Game1"
 
@@ -42,6 +48,12 @@ class Game1(Game):
 
 class Game2(Game):
     prev = 1
+
+    def get_display_emojis(self) -> str:
+        return "🟨⬛🟩"
+
+    def get_score_title(self) -> str:
+        return "Game1"
 
     def _get_regex(self) -> str:
         return "Game2"
@@ -60,6 +72,12 @@ class Game2(Game):
 
 
 class Game3(Game):
+    def get_display_emojis(self) -> str:
+        return "🟨⬛🟩"
+
+    def get_score_title(self) -> str:
+        return "Game1"
+
     def _get_regex(self) -> str:
         return ""
 

@@ -7,6 +7,7 @@ import pandas
 from pandas import DataFrame, Series
 
 from chat_summary.chat import MESSAGE, ChatMember
+from chat_summary.read_messages import get_chat_mapping, read_messages
 
 
 class MessagesDB:
@@ -15,6 +16,7 @@ class MessagesDB:
         self._chat_name = chat_name
         self._display_name = user
         self.silence_contact_error = silence_contact_error
+        self._chat_path = f"/Users/{user}/Library/Messages/chat.db"
 
         users = os.listdir("/Users")
         if user not in users:
@@ -23,7 +25,8 @@ class MessagesDB:
             exit(1)
 
         try:
-            self._connection = sqlite3.connect(f"/Users/{user}/Library/Messages/chat.db")
+            self._connection = sqlite3.connect(self._chat_path)
+
         except sqlite3.OperationalError:
             print("could not connect to messages database, ensure you have the right permissions to access file", file=sys.stderr)
             exit(1)
@@ -31,7 +34,7 @@ class MessagesDB:
             print("could not find stored messages, ensure you have signed in and uploaded iMessages to iCloud", file=sys.stderr)
             exit(1)
 
-    def _select_chat_id(self) -> int:
+    def _select_chat_rowid(self) -> int:
         chats = pandas.read_sql_query(  # pyright: ignore[reportUnknownMemberType]
             f"""
             SELECT
@@ -39,7 +42,7 @@ class MessagesDB:
             FROM
                 chat
             WHERE
-               display_name != "" 
+               display_name != ""
             """,
             self._connection,
         )
@@ -66,13 +69,13 @@ class MessagesDB:
     def _get_chat_members(self, chat_id: int) -> list[ChatMember]:
         numbers: Series[str] = pandas.read_sql_query(  # pyright: ignore[reportUnknownMemberType]
             f"""
-            SELECT 
+            SELECT
                 id
-            FROM 
-                chat_handle_join c 
-                JOIN 
-                    handle h 
-                ON 
+            FROM
+                chat_handle_join c
+                JOIN
+                    handle h
+                ON
                     c.handle_id = h.ROWID
             WHERE
                 chat_id = {chat_id}
@@ -91,14 +94,18 @@ class MessagesDB:
 
             all_contacts = pandas.read_sql_query(  # pyright: ignore[reportUnknownMemberType]
                 """
-                SELECT 
-                    zfirstname, zlastname, zfullnumber
+                SELECT
+                    zfirstname, zlastname, zfullnumber, zaddress
                 FROM
-                    zabcdrecord r 
-                    JOIN 
-                        zabcdphonenumber p 
-                    ON 
+                    zabcdrecord r
+                    JOIN
+                        zabcdphonenumber p
+                    ON
                         r.z_pk = p.zowner
+                    LEFT JOIN
+                        zabcdemailaddress e
+                    ON
+                        r.z_pk = e.zowner
                 """,
                 contacts_connection,
             )  # get all contacts
@@ -112,7 +119,7 @@ class MessagesDB:
 
         for number in numbers:
             for i in range(len(all_contacts)):
-                first, last, contact_number = cast(tuple[str, str, str], all_contacts.iloc[i, :])  # retrieve data from all contacts
+                first, last, contact_number, email = cast(tuple[str, str, str, str], all_contacts.iloc[i, :])  # retrieve data from all contacts
                 contact_number = "".join([n for n in contact_number if n != " "])  # remove spaces
                 if contact_number[0] == "0":  # replace 0 at start with +61
                     contact_number = "+61" + contact_number[1:]
@@ -124,41 +131,24 @@ class MessagesDB:
                     chat_members.append(ChatMember(name, number))
                     break
 
+                if email == number:  # add a found user and break
+                    chat_members.append(ChatMember(name, number))
+                    break
+
             else:  # if we did not find a contact, set the contact name to just the number
                 chat_members.append(ChatMember(number, number))
 
-        chat_members.append(ChatMember(self._display_name, ""))
+        chat_members.append(ChatMember(self._display_name, self._user))
         return chat_members
 
-    def _get_messages(self, chat_id: int) -> Generator[MESSAGE, None, None]:
-        raw_messages = pandas.read_sql_query(  # pyright: ignore[reportUnknownMemberType]
-            f"""
-            SELECT  
-                text,
-                id as phone
-            FROM 
-                (
-                    message m 
-                    JOIN 
-                        chat_message_join c 
-                    ON 
-                        m.ROWID = c.message_id
-                ) 
-                LEFT OUTER JOIN
-                    handle h 
-                ON 
-                    h.ROWID = m.handle_id
-            WHERE
-                chat_id = {chat_id}
-            """,
-            self._connection,
-        )  # get all messages from the chat
-
-        messages = ((cast(tuple[str, str], raw_messages.iloc[i, :])) for i in range(len(raw_messages)))
-        return (MESSAGE(*message) for message in messages)
+    def _get_messages(self, chat_id: str) -> Generator[MESSAGE, None, None]:
+        messages = read_messages(self._chat_path, chat_id, self._user)
+        for message in messages:
+            yield MESSAGE(message["body"], message["phone_number"])
 
     def get_messages_members_from_chat(self) -> tuple[Generator[MESSAGE, None, None], list[ChatMember]]:
-        chat_id = self._select_chat_id()
-        members = self._get_chat_members(chat_id)
+        chat_id = get_chat_mapping(self._chat_path, self._chat_name)
+        rowid = self._select_chat_rowid()
+        members = self._get_chat_members(rowid)
         messages = self._get_messages(chat_id)
         return messages, members

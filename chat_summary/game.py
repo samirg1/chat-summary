@@ -19,6 +19,14 @@ class Game(ABC):
         super().__init__()
 
     @abstractmethod
+    def get_display_emojis(self) -> str:
+        pass
+
+    @abstractmethod
+    def get_score_title(self) -> str:
+        pass  # pragma: no cover
+
+    @abstractmethod
     def _get_regex(self) -> str:
         pass  # pragma: no cover
 
